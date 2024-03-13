@@ -205,14 +205,15 @@ of Krarup are quite distinct and do not feel completely natural compared
 to vanilla Erlang.  So we went with an implementation instead of a proposal.
 
 # To Dos
-- [] Better recompile detection?
-- [] Stronger safety checks for `await`.
+- [ ] More user-friendly messages during parsing.
+- [ ] Better recompile detection?
+- [ ] Stronger safety checks for `await`.
     * Currently only checks if the expression is a `pid()` or a `[pid()]`.
     * Could consider using a `{awaitable, pid()}` for more safety.
-- [] Better code generation.
+- [ ] Better code generation.
     * The code that is currently generated is quite heavy and a bit ugly.
-- [] `supervised` support.
-- [] `monitored` support.
-- [] Add default timeout to match `gen_server` behavior.
-- [] `timeout` support.
-- [] Consider a `dispatcher` behaviour and keyword to implement some kind of pooler.
+- [ ] `supervised` support.
+- [ ] `monitored` support.
+- [ ] Add default timeout to match `gen_server` behavior.
+- [ ] `timeout` support.
+- [ ] Consider a `dispatcher` behaviour and keyword to implement some kind of pooler.
