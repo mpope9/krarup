@@ -1,0 +1,18 @@
+-module(basic).
+
+-export([main/0]).
+
+async count(A, B) ->
+    A + B.
+
+main() ->
+    Result = await count(1, 2),
+    io:format("Count Result: ~p~n", [Result]),
+
+    Pids = [count(2, 3), count(3, 4)],
+    [io:format("Count Result: ~p~n", [await Pid]) || Pid <- Pids],
+
+    Results2 = await [count(5, 6), count(7, 8)],
+    [io:format("Count Result: ~p~n", [R]) || R <- Results2],
+
+    ok.
