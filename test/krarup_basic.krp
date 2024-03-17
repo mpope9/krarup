@@ -1,0 +1,36 @@
+-module(krarup_basic).
+
+-export([
+    await_function_test/2,
+    await_pid_test/2,
+    await_list_test/4,
+    list_of_await_test/4,
+    list_of_await_pids_test/4,
+    list_of_pids_await_test/4
+]).
+
+async count(A, B) ->
+    A + B.
+
+await_function_test(A, B) ->
+    await count(A, B).
+
+await_pid_test(A, B) ->
+    Pid = count(A, B),
+    await Pid.
+
+await_list_test(A, B, C, D) ->
+    await [count(A, B), count(C, D)].
+
+list_of_await_test(A, B, C, D) ->
+    [await count(A, B), await count(C, D)].
+
+list_of_await_pids_test(A, B, C, D) ->
+    Pid1 = count(A, B),
+    Pid2 = count(C, D),
+    [await Pid1, await Pid2].
+
+list_of_pids_await_test(A, B, C, D) ->
+    Pid1 = count(A, B),
+    Pid2 = count(C, D),
+    await [Pid1, Pid2].
