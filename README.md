@@ -27,7 +27,7 @@ async sum(List) ->
     lists:sum(List).
 
 main() ->
-    async linked sum([1, 2, 3]).
+    await linked sum([1, 2, 3]).
 ```
 
 Build
