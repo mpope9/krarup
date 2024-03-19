@@ -7,14 +7,14 @@ data processing flows.
 
 -module(krarup_example).
 
-async count(A, B) ->
+async add(A, B) ->
     A + B.
 
 main() ->
-    Result = await count(1, 2),
+    Result = await add(1, 2),
     io:format("Count Result: ~p~n", [Result]),
 
-    Results2 = await [count(2, 3), count(4, 5)],
+    Results2 = await [add(2, 3), add(4, 5)],
     [io:format("Count Result: ~p~n", [R]) || R <- Results2],
 
 > krarup_example:main().
@@ -50,14 +50,14 @@ rather explicit boilerplate and it is often wrapped in a helper function,
 but the pattern still rather common.
 
 ```erlang
-count(A + B) ->
+add(A + B) ->
     Caller = self(),
     spawn(fun() ->
         Result = A + B,
         Caller ! {self(), Result}
     end),
 
-Pid = count(1, 2),
+Pid = add(1, 2),
 receive
     {Pid, Result} ->
         io:format("", [Result])
