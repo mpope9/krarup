@@ -72,13 +72,12 @@ res = do_some_other_work()
 Task.await(task)
 ```
 This module provides great ergonomics around spawning and waiting for tasks.
-It too suffers from inflexibility when it comes integrating some basic ERTS
-features.  While supervision is nicely packaged with the `Task.Supervisor`
-module, processes are linked automatically and monitors are a second class
-citizen.  Further it is discouraged to trap exits, and the suggested way to
-unlink is through a call to `Task.Supervisor.async_stream_nolink`.
+However, `Elixir.Task`s come with a high level of 'safety'. Links and monitors are
+automatically created and it is expected that the consiquences of these, such as
+linked termination without error trapping and stray messages are dealt with by the
+user as development mounts.
 
-Further `'Elixir.Task'` and `'Elixir.Task.Supervisor'` both not readily available to Erlang users
+Further `Elixir.Task'` and `Elixir.Task.Supervisor` both not readily available to Erlang users
 and are non-trivial to integrate.  The difficultly in using Elixir in Erlang is a well-known
 issue with no clear answer.
 
