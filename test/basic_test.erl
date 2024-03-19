@@ -18,7 +18,9 @@ basic_module_test_() ->
       {"Tests that a list of pids can be awaited on.", ?_test(await_list())},
       {"Tests a list of awaits.", ?_test(list_of_await())},
       {"Tests a list of awaiting on pids.", ?_test(list_of_await_pids())},
-      {"Tests awaiting on a list of pids.", ?_test(list_of_pids_await())}
+      {"Tests awaiting on a list of pids.", ?_test(list_of_pids_await())},
+
+      {"Tests that the linked keyword spawns and links a process.", ?_test(linked())}
     ]}.
 
 %% Setup should compile and load the test module.
@@ -50,3 +52,14 @@ list_of_await_pids() ->
 
 list_of_pids_await() ->
     ?assertEqual([3, 7], krarup_basic:list_of_pids_await_test(1, 2, 3, 4)).
+
+linked() ->
+    {_, Links} = process_info(self(), links),
+    LinkCount = length(Links),
+    Pid = krarup_basic:linked_test(1, 2),
+    {_, LinksNew} = process_info(self(), links),
+    LinkCountNew = length(LinksNew),
+    ?assertEqual(LinkCount + 1, LinkCountNew),
+    Pid ! msg,
+    ?assertEqual(3, krarup_basic:await_pid(Pid)).
+

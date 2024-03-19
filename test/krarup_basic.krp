@@ -1,36 +1,54 @@
 -module(krarup_basic).
 
 -export([
+    await_pid/1,
+
     await_function_test/2,
     await_pid_test/2,
     await_list_test/4,
     list_of_await_test/4,
     list_of_await_pids_test/4,
-    list_of_pids_await_test/4
+    list_of_pids_await_test/4,
+
+    linked_test/2
 ]).
 
-async count(A, B) ->
+% Adds two numbers async.
+async add(A, B) ->
     A + B.
 
+% Adds two numbers async and waits for a message before returning.
+async add_receive(A, B) ->
+    X = A + B,
+    receive msg -> ok end,
+    X.
+
+% Function used to consume an async pid.
+await_pid(Pid) ->
+    await Pid.
+
 await_function_test(A, B) ->
-    await count(A, B).
+    await add(A, B).
 
 await_pid_test(A, B) ->
-    Pid = count(A, B),
+    Pid = add(A, B),
     await Pid.
 
 await_list_test(A, B, C, D) ->
-    await [count(A, B), count(C, D)].
+    await [add(A, B), add(C, D)].
 
 list_of_await_test(A, B, C, D) ->
-    [await count(A, B), await count(C, D)].
+    [await add(A, B), await add(C, D)].
 
 list_of_await_pids_test(A, B, C, D) ->
-    Pid1 = count(A, B),
-    Pid2 = count(C, D),
+    Pid1 = add(A, B),
+    Pid2 = add(C, D),
     [await Pid1, await Pid2].
 
 list_of_pids_await_test(A, B, C, D) ->
-    Pid1 = count(A, B),
-    Pid2 = count(C, D),
+    Pid1 = add(A, B),
+    Pid2 = add(C, D),
     await [Pid1, Pid2].
+
+linked_test(A, B) ->
+    linked add_receive(A, B).

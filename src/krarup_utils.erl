@@ -3,14 +3,24 @@
 -export([build_await_expr/2]).
 
 
+build_await_expr({atom, _, linked}, Expr) ->
+
+    Counter = get_counter(),
+    GenTemplate = "
+    fun() ->
+        KrarupRegisterValue~p = ~ts,
+        link(KrarupRegisterValue~p),
+        KrarupRegisterValue~p
+    end().
+    ",
+
+    ExprString = erl_prettypr:format(Expr),
+    FmtArgs = [Counter, ExprString, Counter, Counter],
+    parse_gen(GenTemplate, FmtArgs, Counter);
+
 build_await_expr({atom, _, await}, Expr) ->
 
-    Counter =
-        case erlang:get(krarup_counter) of
-            undefined -> 0;
-            C -> C
-        end,
-
+    Counter = get_counter(),
     GenTemplate = "
     begin
         KrarupRegisterRecvFun~p = fun
@@ -23,7 +33,7 @@ build_await_expr({atom, _, await}, Expr) ->
             (_) ->
                 error(badarg)
         end,
-    KrarupRegisterValue~p = ~ts,
+        KrarupRegisterValue~p = ~ts,
         case KrarupRegisterValue~p of
             KrarupRegisterMaybeList~p when is_list(KrarupRegisterValue~p) ->
                 [
@@ -41,30 +51,22 @@ build_await_expr({atom, _, await}, Expr) ->
     FmtArgs1 = lists:duplicate(7, Counter),
     FmtArgs2 = lists:duplicate(10, Counter),
     FmtArgs = FmtArgs1 ++ [ExprString] ++ FmtArgs2,
+    parse_gen(GenTemplate, FmtArgs, Counter).
+
+
+parse_gen(GenTemplate, FmtArgs, Counter) ->
     GenCode = lists:flatten(io_lib:format(GenTemplate, FmtArgs)),
 
     {ok, GenTokenized, _} = erl_scan:string(GenCode),
     {ok, [GenParsed]} = erl_parse:parse_exprs(GenTokenized),
-    erlang:put(krarup_counter, Counter + 1),
+    bump_counter(Counter),
     GenParsed.
 
+get_counter() ->
+    case erlang:get(krarup_counter) of
+        undefined -> 0;
+        C -> C
+    end.
 
-%build_await_expr_old({atom, _, await}, Expr) ->
-%    RegisterPid = 'KrarupRegisterPid',
-%    RegisterResult = 'KrarupRegisterResult',
-%    ExprCallMatch = {match,1,{var,1,RegisterPid},Expr},
-%
-%    ClauseInternal =
-%        [{clause,5,
-%          [{tuple,5,[{var,5,RegisterPid},{var,5,RegisterResult}]}],
-%          [],
-%          [{var,6,RegisterResult}]}],
-%    ExprReceive = {'receive',1,ClauseInternal},
-%
-%    % Build anonymous function to wrap function's definition.
-%    ExprFun = {'fun',4, {clauses, [{clause, 4, [], [], [ExprCallMatch,ExprReceive]}]}},
-%
-%    % Call anonymous function in-line. Hacky but works for now.
-%    {call,4, ExprFun, []}.
-%
-
+bump_counter(Counter) ->
+    erlang:put(krarup_counter, Counter + 1).
