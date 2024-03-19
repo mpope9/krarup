@@ -7,11 +7,11 @@ build_await_expr({atom, _, linked}, Expr) ->
 
     Counter = get_counter(),
     GenTemplate = "
-    fun() ->
+    begin
         KrarupRegisterValue~p = ~ts,
         link(KrarupRegisterValue~p),
         KrarupRegisterValue~p
-    end().
+    end.
     ",
 
     ExprString = erl_prettypr:format(Expr),
