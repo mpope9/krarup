@@ -11,7 +11,6 @@
 %""".
 
 -behaviour(rebar_compiler).
--behaviour(provider).
 
 -export([init/1,
 
@@ -20,51 +19,54 @@
          needed_files/4,
          dependencies/3,
          compile/4,
-         clean/2,
+         clean/2
 
          % Provider callbacks.
-         do/1,
-         format_error/1
         ]).
 
--define(PROVIDER, compile).
+-define(COMPILE_PROVIDER, compile).
+-define(NEW_PROVIDER, new).
+
 -define(NAMESPACE, krp).
--define(DEPS, [{default, app_discovery}]).
+%-define(DEPS, [{default, app_discovery}]).
 
 
 %-spec init(rebar_state:t()) -> {ok, rebar_state:t()}.
 -spec init(term()) -> {ok, term()}.
 init(State) ->
-    %% Optional:
     Provider = providers:create([
-        {name, ?PROVIDER},
+        {name, ?COMPILE_PROVIDER},
         {namespace, ?NAMESPACE},
         {module, ?MODULE},
         {bare, true},
-        {deps, ?DEPS},
+        %{deps, ?DEPS},
         {example, "rebar3 krp compile"},
         {opts, []},
-        {short_desc, "Krp compiler plugin"},
+        {short_desc, "Krarup compiler plugin"},
         {desc, ""}
     ]),
     State1 = rebar_state:add_provider(State, Provider),
 
+    Provider2 = providers:create([
+        {name, ?NEW_PROVIDER},
+        {namespace, ?NAMESPACE},
+        {module, ?MODULE},
+        {bare, true},
+        %{deps, ?DEPS},
+        {example, "rebar3 krp new"},
+        {opts, []},
+        {short_desc, "Krarup application generator."},
+        {desc, ""}
+    ]),
+    State2 = rebar_state:add_provider(State1, Provider2),
+
     %% If needing the new compiler module to take precedence over
     %% other ones (i.e. generating .erl files from another format):
-    State2 = rebar_state:prepend_compilers(State1, [krarup]),
-    {ok, State2}.
+    State3 = rebar_state:prepend_compilers(State2, [krarup]),
+    {ok, State3}.
 
 
 %% Provider Callbacks.
-
--spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
-do(State) ->
-    io:format("Do State: ~p~n", [State]),
-    {ok, State}.
-
--spec format_error(any()) -> iolist().
-format_error(Reason) ->
-    io_lib:format("~p", [Reason]).
 
 
 %% Compiler Callbacks.
