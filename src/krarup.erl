@@ -11,13 +11,21 @@
 %""".
 
 -behaviour(rebar_compiler).
+-behaviour(provider).
 
--export([context/1,
+-export([init/1,
+
+         % Compiler callbacks
+         context/1,
          needed_files/4,
          dependencies/3,
          compile/4,
          clean/2,
-         init/1]).
+
+         % Provider callbacks.
+         do/1,
+         format_error/1
+        ]).
 
 -define(PROVIDER, compile).
 -define(NAMESPACE, krp).
@@ -46,6 +54,20 @@ init(State) ->
     State2 = rebar_state:prepend_compilers(State1, [krarup]),
     {ok, State2}.
 
+
+%% Provider Callbacks.
+
+-spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
+do(State) ->
+    io:format("Do State: ~p~n", [State]),
+    {ok, State}.
+
+-spec format_error(any()) -> iolist().
+format_error(Reason) ->
+    io_lib:format("~p", [Reason]).
+
+
+%% Compiler Callbacks.
 
 context(AppInfo) ->
     Dir = rebar_app_info:dir(AppInfo),
@@ -121,9 +143,9 @@ scan(String,Acc) ->
 
 scan_done({error,ErrorMsg,_Location},_LeftOverChars,_Acc)->
     ErrorMsg;
-scan_done({eof,Location},LeftOverChars,Acc)->
+scan_done({eof,_Location},_LeftOverChars,Acc)->
     Acc;
-scan_done({ok,Tokens,Location},LeftOverChars,Acc)->
+scan_done({ok,Tokens,_Location},LeftOverChars,Acc)->
     case krarup_parse:parse_form(Tokens) of
     {ok,R}->scan(LeftOverChars,Acc++[R]);
     {error,R}->scan(LeftOverChars,R)
