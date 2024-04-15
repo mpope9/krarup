@@ -43,10 +43,22 @@ init(State) ->
     ]),
     State1 = rebar_state:add_provider(State, Provider),
 
+    Provider2 = providers:create([
+        {name, new},
+        {namespace, ?NAMESPACE},
+        {module, krarup_project},
+        {bare, true},
+        {example, "rebar3 krp new"},
+        {opts, []},
+        {short_desc, "Krarup application generator."},
+        {desc, ""}
+    ]),
+    State2 = rebar_state:add_provider(State1, Provider2),
+
     %% If needing the new compiler module to take precedence over
     %% other ones (i.e. generating .erl files from another format):
-    State2 = rebar_state:prepend_compilers(State1, [krarup]),
-    {ok, State2}.
+    State3 = rebar_state:prepend_compilers(State2, [krarup]),
+    {ok, State3}.
 
 
 context(AppInfo) ->
