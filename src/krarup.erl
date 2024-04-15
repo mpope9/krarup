@@ -12,22 +12,18 @@
 
 -behaviour(rebar_compiler).
 
--export([init/1,
+-include("krarup.hrl").
 
-         % Compiler callbacks
+-export([init/1,
          context/1,
          needed_files/4,
          dependencies/3,
          compile/4,
          clean/2
-
-         % Provider callbacks.
         ]).
 
--define(COMPILE_PROVIDER, compile).
--define(NEW_PROVIDER, new).
+-define(PROVIDER, compile).
 
--define(NAMESPACE, krp).
 %-define(DEPS, [{default, app_discovery}]).
 
 
@@ -35,7 +31,7 @@
 -spec init(term()) -> {ok, term()}.
 init(State) ->
     Provider = providers:create([
-        {name, ?COMPILE_PROVIDER},
+        {name, ?PROVIDER},
         {namespace, ?NAMESPACE},
         {module, ?MODULE},
         {bare, true},
@@ -47,29 +43,11 @@ init(State) ->
     ]),
     State1 = rebar_state:add_provider(State, Provider),
 
-    Provider2 = providers:create([
-        {name, ?NEW_PROVIDER},
-        {namespace, ?NAMESPACE},
-        {module, ?MODULE},
-        {bare, true},
-        %{deps, ?DEPS},
-        {example, "rebar3 krp new"},
-        {opts, []},
-        {short_desc, "Krarup application generator."},
-        {desc, ""}
-    ]),
-    State2 = rebar_state:add_provider(State1, Provider2),
-
     %% If needing the new compiler module to take precedence over
     %% other ones (i.e. generating .erl files from another format):
-    State3 = rebar_state:prepend_compilers(State2, [krarup]),
-    {ok, State3}.
+    State2 = rebar_state:prepend_compilers(State1, [krarup]),
+    {ok, State2}.
 
-
-%% Provider Callbacks.
-
-
-%% Compiler Callbacks.
 
 context(AppInfo) ->
     Dir = rebar_app_info:dir(AppInfo),
