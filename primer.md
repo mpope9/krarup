@@ -77,9 +77,10 @@ automatically created and it is expected that the consequences of these, such as
 linked termination without error trapping and stray messages are dealt with by the
 user as development mounts.
 
-Further `Elixir.Task` and `Elixir.Task.Supervisor` are not readily available
-to Erlang users and are non-trivial to integrate.  The difficultly in using Elixir
-in Erlang is a well-known issue with no clear answer for every environment.
+Further the `Elixir.Task` and `Elixir.Task.Supervisor` modules are not readily
+available to Erlang users and are non-trivial to integrate.  The difficultly
+in using Elixir in Erlang is a well-known issue with no clear answer for
+every environment.
 
 For simple repeatable tasks new syntactic sugar can be added to Erlang which can
 increase developer productivity in designing, prototyping, and iterating on
