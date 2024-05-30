@@ -6,9 +6,10 @@
 %%% %CopyrightEnd%
 %%%-----------------------------------------------------------------------------
 -module(krarup).
-%-moduledoc """
-%Main Krarup compiler.
-%""".
+
+-moduledoc """
+Main Krarup compiler.
+""".
 
 -behaviour(rebar_compiler).
 
