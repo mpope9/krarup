@@ -240,7 +240,7 @@ attr_val -> expr                     : ['$1'].
 attr_val -> expr ',' exprs           : ['$1' | '$3'].
 attr_val -> '(' expr ',' exprs ')'   : ['$2' | '$4'].
 
-function -> atom function_clauses : build_async_function('$1', '$2').
+function -> atom function_clauses : krarup_utils:build_async_function('$1', '$2').
 function -> function_clauses : build_function('$1').
 
 function_clauses -> function_clause : ['$1'].
@@ -733,6 +733,8 @@ Header
 
 Erlang code.
 
+-include_lib("krarup.hrl").
+
 -export([parse_form/1,parse_exprs/1,parse_term/1]).
 -export([normalise/1,abstract/1,tokens/1,tokens/2]).
 -export([abstract/2]).
@@ -1208,9 +1210,6 @@ Erlang code.
             {op,Anno,Op,A}
         end).
 
-%% keep track of annotation info in tokens
--define(anno(Tup), element(2, Tup)).
-
 %-define(DEBUG, true).
 
 -ifdef(DEBUG).
@@ -1487,51 +1486,7 @@ term(Expr) ->
 build_function(Cs) ->
     Name = element(3, hd(Cs)),
     Arity = length(element(4, hd(Cs))),
-    {function,?anno(hd(Cs)),Name,Arity,check_clauses(Cs, Name, Arity)}.
-
-build_async_function({atom, _, async}, Cs) ->
-    Name = element(3, hd(Cs)),
-    Arity = length(element(4, hd(Cs))),
-
-    % Unique enough vars to save results.
-    RegisterReturn = 'KrarupRegisterReturn',
-    RegisterCaller = 'KrarupRegisterCaller',
-
-    % Currently this only supports single head functions.
-    Clauses = check_clauses(Cs, Name, Arity),
-    [{clause,LnClauses,VarsClauses,What,Exprs}] = Clauses,
-
-    ExprsRev = lists:reverse(Exprs),
-    [ExprLast | ExprRevRest] = ExprsRev,
-
-    % Save the final expression in the result register.
-    LnExpr = element(2, ExprLast),
-    ExprLastMatch = {match,LnExpr,{var,6,RegisterReturn},ExprLast},
-
-    % Create new send from the result register to the caller register.
-    ExprSend =
-        {op,LnExpr+1,'!',
-           {var,LnExpr+1,RegisterCaller},
-           {tuple,LnExpr+1,
-            [
-             {call,LnExpr+1,{atom,LnExpr+1,self},[]},
-             {var,LnExpr+1,RegisterReturn}
-            ]}},
-    ExprFunctionNew = lists:reverse([ExprSend,ExprLastMatch|ExprRevRest]),
-
-    % Build anonymous function to wrap function's definition.
-    ExprFun = {'fun',4, {clauses, [{clause, 4, [], [], ExprFunctionNew}]}},
-
-    % Caller register assignment and spawn that encapulates the function's body.
-    ExprMatchRegisterCall =
-        {match,3,{var,3,RegisterCaller},{call,3,{atom,3,self},[]}},
-    ExprSpawn = {call,4, {atom,4,spawn}, [ExprFun]},
-
-    % Rebuild function definition.
-    ExprsCallAndSpawn = [ExprMatchRegisterCall, ExprSpawn],
-    ClausesNew = [{clause,LnClauses,VarsClauses,What,ExprsCallAndSpawn}],
-    {function,?anno(hd(Cs)),Name,Arity,ClausesNew}.
-
+    {function,?anno(hd(Cs)),Name,Arity,krarup_utils:check_clauses(Cs, Name, Arity)}.
 
 
 %% build_fun(Anno, [Clause]) -> {'fun',Anno,{clauses,[Clause]}}.
@@ -1539,21 +1494,13 @@ build_async_function({atom, _, async}, Cs) ->
 build_fun(Anno, Cs) ->
     Name = element(3, hd(Cs)),
     Arity = length(element(4, hd(Cs))),
-    CheckedCs = check_clauses(Cs, Name, Arity),
+    CheckedCs = krarup_utils:check_clauses(Cs, Name, Arity),
     case Name of
         'fun' ->
             {'fun',Anno,{clauses,CheckedCs}};
         Name ->
             {named_fun,Anno,Name,CheckedCs}
     end.
-
-check_clauses(Cs, Name, Arity) ->
-    [case C of
-         {clause,A,N,As,G,B} when N =:= Name, length(As) =:= Arity ->
-             {clause,A,As,G,B};
-         {clause,A,_N,_As,_G,_B} ->
-             ret_err(A, "head mismatch")
-     end || C <- Cs].
 
 build_try(A,Es,Scs,{Ccs,As}) ->
     {'try',A,Es,Scs,Ccs,As}.
