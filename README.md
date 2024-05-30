@@ -3,7 +3,10 @@ krarup
 
 krarup is an Erlang dialect for composing concurrent data processing flows.
 
-For more details and examples, [see the primer](https://github.com/mpope9/krarup/blob/main/primer.md).
+For more details [see the primer](https://github.com/mpope9/krarup/blob/main/primer.md).
+For examples, see [examples/](examples/).
+
+Currently based on Erlang 27.
 
 Install
 -------
