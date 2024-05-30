@@ -75,7 +75,6 @@ dependencies(_, _, _) ->
 compile(Source, [{_, _}], Config, Opts) ->
     {ok, Contents} = file:read_file(Source),
     ScanResult = catch (scan(binary_to_list(Contents))),
-    io:format("~p~n", [ScanResult]),
     handle_parse(ScanResult, Source, Config, Opts).
 
 clean(XrlFiles, _AppInfo) ->
@@ -98,6 +97,7 @@ update_opts(Opts, AppInfo) ->
               end, Opts).
 
 handle_parse({error, {_, _, Description}},  Source, Config, Opts) ->
+    rebar_log:log(error, "krp compiler: File: ~ts, Message: ~ts", [Source, Description]),
     rebar_compiler:error_tuple(Source, Description, "", Config, Opts);
 handle_parse(Ast,  Source, Config, Opts) ->
     Generated = [[erl_prettypr:format(A), "\n"] || A <- Ast],
