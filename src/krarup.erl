@@ -6,9 +6,10 @@
 %%% %CopyrightEnd%
 %%%-----------------------------------------------------------------------------
 -module(krarup).
-%-moduledoc """
-%Main Krarup compiler.
-%""".
+
+-moduledoc """
+Main Krarup compiler.
+""".
 
 -behaviour(rebar_compiler).
 
@@ -73,7 +74,8 @@ dependencies(_, _, _) ->
 
 compile(Source, [{_, _}], Config, Opts) ->
     {ok, Contents} = file:read_file(Source),
-    handle_parse(scan(binary_to_list(Contents)), Source, Config, Opts).
+    ScanResult = catch (scan(binary_to_list(Contents))),
+    handle_parse(ScanResult, Source, Config, Opts).
 
 clean(XrlFiles, _AppInfo) ->
     rebar_file_utils:delete_each(
@@ -95,6 +97,7 @@ update_opts(Opts, AppInfo) ->
               end, Opts).
 
 handle_parse({error, {_, _, Description}},  Source, Config, Opts) ->
+    rebar_log:log(error, "krp compiler: File: ~ts, Message: ~ts", [Source, Description]),
     rebar_compiler:error_tuple(Source, Description, "", Config, Opts);
 handle_parse(Ast,  Source, Config, Opts) ->
     Generated = [[erl_prettypr:format(A), "\n"] || A <- Ast],
@@ -121,9 +124,9 @@ scan(String,Acc) ->
 
 scan_done({error,ErrorMsg,_Location},_LeftOverChars,_Acc)->
     ErrorMsg;
-scan_done({eof,Location},LeftOverChars,Acc)->
+scan_done({eof,_Location},_LeftOverChars,Acc)->
     Acc;
-scan_done({ok,Tokens,Location},LeftOverChars,Acc)->
+scan_done({ok,Tokens,_Location},LeftOverChars,Acc)->
     case krarup_parse:parse_form(Tokens) of
     {ok,R}->scan(LeftOverChars,Acc++[R]);
     {error,R}->scan(LeftOverChars,R)
