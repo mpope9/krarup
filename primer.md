@@ -102,9 +102,10 @@ then it can be used with ease.
 
 This introduces a few new keywords to the language:
 ### async
-* Async is defined on the function's definitions.
-* This signals that this function can be awaited, or it can be called directly and pid will be returned.
+* Async is defined on a function's definitions.
+* This signals that a function can be awaited, or it can be called directly and pid will be returned.
 * Unlike other languages `async` does not 'bleed'.  Async functions can be called from non-async functions.
+    * Everything in Erlang can be `async`, unlike languages that added `async` after the fact.
 * A pid and not a `Future` equivalent is returned. 
 
 ### await
@@ -114,7 +115,7 @@ This introduces a few new keywords to the language:
 * `await` can be called from any function, even non-`async` functions.
 
 #### Quick async/await Note
-The semantics of `async`/`await` is notability different than other language
+The semantics of `async`/`await` are notability different than other language
 implementations.  `await` can be used anywhere, not just in functions defined
 with `async`.  Erlang can be considered `async` by default, so function
 [coloring](https://www.tedinski.com/2018/11/13/function-coloring.html) and
@@ -171,7 +172,7 @@ main() ->
 ```
 
 ```erlang
-% src/processor.krp
+% src/processor.erl
 -module(processor).
 
 handle_file(FileName) ->
