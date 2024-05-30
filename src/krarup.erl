@@ -75,6 +75,7 @@ dependencies(_, _, _) ->
 compile(Source, [{_, _}], Config, Opts) ->
     {ok, Contents} = file:read_file(Source),
     ScanResult = catch (scan(binary_to_list(Contents))),
+    io:format("~p~n", [ScanResult]),
     handle_parse(ScanResult, Source, Config, Opts).
 
 clean(XrlFiles, _AppInfo) ->
