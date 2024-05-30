@@ -1,7 +1,7 @@
 -module(external_failure).
 
 -export([
-    test/1
+    test/0
 ]).
 
 test() ->
