@@ -28,8 +28,7 @@ Count Result: 7
 ```erlang
 % rebar.config
 
-{deps, [krarup]}.
-{plugins, [krarup]}.
+{plugins, [{krarup, {git, "https://github.com/mpope9/krarup/", {branch, "main"}}}]}.
 ```
 
 ## Primer

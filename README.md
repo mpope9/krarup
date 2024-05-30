@@ -13,8 +13,7 @@ Install
 ```erlang
 % rebar.config
 
-{deps, [krarup]}.
-{plugins, [krarup]}.
+{plugins, [{krarup, {git, "https://github.com/mpope9/krarup/", {branch, "main"}}}]}.
 ```
 
 This will search for `.krp` files in the `src/` directory.
