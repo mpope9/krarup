@@ -237,11 +237,14 @@ of krarup are quite distinct and do not feel completely natural compared
 to vanilla Erlang.  So we went with an implementation instead of a proposal.
 
 ## To Dos
-- [x] `linked` support.
+- [ ] `linked` support.
+    - [x] Basic `linked` support on a single `pid()`.
+    - [ ] `linked` support on list of `pid()`s.
     - [ ] Use `spawn_link` in `async` function instead of `link/1` function.
 - [ ] `supervised` support.
 - [ ] `monitored` support.
 - [ ] More user-friendly messages during parsing.
+    - [x] Sane error for in-module `await` violations.
 - [ ] Better recompile detection?
 - [ ] Stronger safety checks for `await`.
     * Currently only checks if the expression is a `pid()` or a `[pid()]`.
