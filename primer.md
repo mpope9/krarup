@@ -37,9 +37,9 @@ The Erlang language is simple.  Once fluency is achieved rather quickly
 then productivity is unrivaled.
 
 We created krarup, a new Erlang dialect and a superset of Erlang, to provide
-convenience keywords which create simple abstractions for common process-related
-boilerplate.  These keywords can be used as quick building blocks to create
-concurrent data processing flows.
+convenience keywords take care of some common process-related boilerplate.
+These keywords can be used as quick building blocks to quickly create and
+prototype concurrent data processing flows that can be promoted to production.
 
 The key additions are `async` and `await` to simplify spawning worker processes.
 
@@ -77,9 +77,9 @@ automatically created and it is expected that the consequences of these, such as
 linked termination without error trapping and stray messages are dealt with by the
 user as development mounts.
 
-Further `Elixir.Task'` and `Elixir.Task.Supervisor` both not readily available
+Further `Elixir.Task` and `Elixir.Task.Supervisor` are not readily available
 to Erlang users and are non-trivial to integrate.  The difficultly in using Elixir
-in Erlang is a well-known issue with no clear answer.
+in Erlang is a well-known issue with no clear answer for every environment.
 
 For simple repeatable tasks new syntactic sugar can be added to Erlang which can
 increase developer productivity in designing, prototyping, and iterating on
@@ -133,19 +133,18 @@ main() ->
     % Links to the child process and waits for the response.
     await linked add(1, 2).
 ```
+
 ### monitored
 ### supervised
 ### timeout<integer()>
 
 ## Control and Data Planes
-TODO: FLESH OUT MORE.
-
 krarup by default encourages the user to define the control and data planes
 of their programs separately.  To achieve this, `await` can only wait on `async`
 functions defined in the current module.  We refer to the code that deals with
-concurrency and data-flow definition as the 'Control Plane'.  This is similar
-to the definition in networking.  Code that performs data manipulation and validation
-is refered to as the 'Data Plane'.  The krarup programming data plane is slightly
+concurrency and data-flow definition as the 'Control Plane'.
+Code that performs data manipulation and validation is refered to as
+the 'Data Plane'.  The krarup programming data plane is slightly
 similar to the networking concept, but less so than the Control Plane.
 
 Here is a small example that demonstrates how the Control and Data Planes enforce
@@ -191,7 +190,7 @@ moving the concurrency story outside of the current module.
 
 
 ## Inconsistency In Erlang
-* `!` vs `receive` vs `spawn` (operator, keyword, function).
+* `!` vs `receive` vs `spawn`/`link` (operator, keyword, BIF function, BIF function).
 
 ## Consistency With Erlang
 
