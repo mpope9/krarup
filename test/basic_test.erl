@@ -1,14 +1,13 @@
-%-moduledoc """
-%Basic test suite for the krarup compiler.
-%Tests basic functionality of compiled modules.
-%""".
-
 -module(basic_test).
+-moduledoc """
+Basic test suite for the krarup compiler.
+Tests basic functionality of compiled modules.
+""".
+
 -include_lib("eunit/include/eunit.hrl").
 
 -define(BASIC_KRP, "test/krarup_basic.krp").
 -define(BASIC_ERL, "test/krarup_basic.erl").
--define(COMPILER_OPTS, [binary,verbose,report_errors,report_warnings]).
 
 basic_module_test_() ->
     
@@ -20,19 +19,17 @@ basic_module_test_() ->
       {"Tests a list of awaiting on pids.", ?_test(list_of_await_pids())},
       {"Tests awaiting on a list of pids.", ?_test(list_of_pids_await())},
 
-      {"Tests that the linked keyword spawns and links a process.", ?_test(linked())}
-    ]}.
+      {"Tests that the linked keyword spawns and links a process.", ?_test(linked())}]}.
 
 %% Setup should compile and load the test module.
 setup() ->
-    ok = krarup:compile(?BASIC_KRP, [{ok, ok}], [], []),
-    {ok, _, CodeBin} = compile:file(?BASIC_ERL, ?COMPILER_OPTS),
-    code:load_binary(krarup_basic, ?BASIC_ERL, CodeBin),
+    Mods = [{?BASIC_KRP, ?BASIC_ERL, krarup_basic}],
+    krarup_test_utils:setup(Mods),
     ok.
 
 %% Cleanup cleans up the test module.
 cleanup(_) ->
-    file:delete("test/krarup_basic.erl"),
+    krarup_test_utils:cleanup([?BASIC_ERL]),
     ok.
 
 await_function() ->

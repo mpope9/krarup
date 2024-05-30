@@ -1,0 +1,5 @@
+-module(external_mod).
+
+-export([external_fun/0]).
+
+async external_fun() -> ok.

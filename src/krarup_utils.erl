@@ -73,6 +73,18 @@ build_await_expr({atom, _, linked}, Expr) ->
 
 build_await_expr({atom, _, await}, Expr) ->
 
+    case erlang:element(1, Expr) of
+        call ->
+            {call,Anno,InnerExpr,_} = Expr,
+            case erlang:element(1, InnerExpr) of
+                atom -> ok;
+                % Pids can be waited on and are validated at runtime.
+                var -> ok;
+                _ -> ret_err(Anno, "'await' can only be used on local functions.")
+            end;
+        _ ->
+            ok
+    end,
     Counter = get_counter(),
     GenTemplate = "
     begin

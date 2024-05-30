@@ -1,0 +1,8 @@
+-module(external_failure).
+
+-export([
+    test/1
+]).
+
+test() ->
+    await external_mod:external_fun().
